@@ -28,8 +28,11 @@ canonicalId,name,description,module,path
 "bmad-qa-generate-e2e-tests","bmad-qa-generate-e2e-tests","Generate automated API and end-to-end tests for implemented features. Use when the user says ""create qa automated tests for [feature]""","bmm","_bmad/bmm/ship/bmad-qa-generate-e2e-tests/SKILL.md"
 "bmad-retrospective","bmad-retrospective","Review a completed epic against the evidence it left behind — spec, stories, diffs, commits, sprint status — and produce a retrospective with sourced findings, action items, and an acceptance decision. Use when the user says ""run a retrospective"" or ""lets retro the epic [epic]"". Supports -H/--headless","bmm","_bmad/bmm/ship/bmad-retrospective/SKILL.md"
 "bmad-walkthrough","bmad-walkthrough","Walk the user through reviewing a change: what it is for, what to look at closely, and how to test it. Use when the user says ""walkthrough"", ""walk me through this change"", or ""human review""","bmm","_bmad/bmm/ship/bmad-walkthrough/SKILL.md"
+<<<<<<< HEAD
 "bmad-agent-builder","bmad-agent-builder","Builds, edits or analyzes Agent Skills through conversational discovery. Use when the user requests to ""Create an Agent"", ""Analyze an Agent"" or ""Edit an Agent"".","bmb","_bmad/bmb/bmad-agent-builder/SKILL.md"
 "bmad-bmb-setup","bmad-bmb-setup","Sets up BMad Builder module in a project. Use when the user requests to 'install bmb module', 'configure BMad Builder', or 'setup BMad Builder'.","bmb","_bmad/bmb/bmad-bmb-setup/SKILL.md"
 "bmad-eval-runner","bmad-eval-runner","Run a skill's evals and report results. Use when the user wants to evaluate a skill, run evals, benchmark a skill, validate triggers, optimize a description, or grade skill outputs.","bmb","_bmad/bmb/bmad-eval-runner/SKILL.md"
 "bmad-module-builder","bmad-module-builder","Plans, creates, and validates BMad modules. Use when the user requests to 'ideate module', 'plan a module', 'create module', 'build a module', or 'validate module'.","bmb","_bmad/bmb/bmad-module-builder/SKILL.md"
 "bmad-workflow-builder","bmad-workflow-builder","Builds, edits, and analyzes workflows and skills. Use when the user requests to ""build a workflow"", ""modify a workflow"", ""quality check workflow"", or ""analyze skill"".","bmb","_bmad/bmb/bmad-workflow-builder/SKILL.md"
+=======
+>>>>>>> 397a2aa4be23c3df69ef6e8aab73fbf72000e2bc

@@ -1,33 +1,21 @@
 installation:
   version: 6.12.4
-  installDate: 2026-10-26T07:52:34.930Z
-  lastUpdated: 2026-10-26T07:52:34.930Z
+  installDate: 2026-10-25T10:53:29.076Z
+  lastUpdated: 2026-10-25T10:53:29.076Z
   installShims: false
 modules:
   - name: core
     version: 6.12.4
-    installDate: 2026-10-26T07:52:34.146Z
-    lastUpdated: 2026-10-26T07:52:34.924Z
+    installDate: 2026-10-25T10:53:28.826Z
+    lastUpdated: 2026-10-25T10:53:29.075Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
     version: 6.12.4
-    installDate: 2026-10-26T07:52:34.517Z
-    lastUpdated: 2026-10-26T07:52:34.926Z
+    installDate: 2026-10-25T10:53:29.027Z
+    lastUpdated: 2026-10-25T10:53:29.076Z
     source: built-in
     npmPackage: null
     repoUrl: null
-  - name: bmb
-    version: v2.2.2
-    installDate: 2026-10-26T07:52:34.820Z
-    lastUpdated: 2026-10-26T07:52:34.930Z
-    source: external
-    npmPackage: bmad-builder
-    repoUrl: https://github.com/bmad-code-org/bmad-builder
-    channel: stable
-    sha: 4a1422274a2acb0fb0ec0511753da6263948f072
-ides:
-  - antigravity-cli
-  - antigravity
-  - qwen
+ides: []
