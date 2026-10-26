@@ -1,0 +1,870 @@
+<div class="app-container">
+  <!-- Top Global Navigation Header -->
+  <header class="cockpit-header">
+    <div class="header-left">
+      <a class="brand" href="#" aria-label="Nébula Inicio">
+        <span class="brand-badge">
+          <svg viewBox="0 0 40 40" fill="none">
+            <path d="M20 5v7m-7 3h14l-2 6H15l-2-6Zm3 6v9m8-9v9m-8 0h8m-12 0h16l2 5H12l2-5Zm6 5v7m-7 0h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 5c-2-2-1-3 1-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <span class="brand-title">nébula<span>.</span></span>
+          <span class="brand-sub">COCKPIT DE COLECCIÓN</span>
+        </div>
+      </a>
+
+      <div class="status-pill" [ngClass]="currentHookah.status">
+        <span class="pulse-dot"></span>
+        <span>{{ currentHookah.name }}: <strong>{{ currentHookah.statusLabel }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Center active mode toggle -->
+    <div class="header-center-nav">
+      <button class="nav-tab active" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+        Estudio Central
+      </button>
+      <button class="nav-tab" type="button" (click)="toggleInspect()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        {{ isInspecting ? 'Ocultar Inspección' : 'Inspección de Partes' }}
+      </button>
+      <button class="nav-tab" type="button" (click)="toggleSession()">
+        <span class="session-dot" [class.live]="isSessionActive"></span>
+        {{ isSessionActive ? 'Sesión en curso (' + formattedSessionTime + ')' : 'Iniciar Sesión' }}
+      </button>
+    </div>
+
+    <div class="header-right">
+      <div class="user-chip">
+        <span class="user-avatar">JL</span>
+        <div class="user-info">
+          <strong>Javier López</strong>
+          <small>Coleccionista Pro</small>
+        </div>
+      </div>
+      <button class="icon-btn" type="button" title="Notificaciones" aria-label="Notificaciones">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge-dot"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Cockpit Layout: Left Functionalities | Central Big Hookah | Right Functionalities -->
+  <main class="cockpit-grid">
+
+    <!-- ==================== LEFT COLUMN: COLECCIÓN, TELEMETRÍA & SESIÓN ==================== -->
+    <aside class="flank-column flank-left" aria-label="Gestión de colección y telemetría">
+      
+      <!-- Card 1: Selector de Kachimbas -->
+      <section class="cockpit-card">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">COLECCIÓN</span>
+            <h2 class="card-title">Mis Kachimbas</h2>
+          </div>
+          <span class="count-badge">{{ hookahs.length }} modelos</span>
+        </div>
+
+        <div class="hookah-selector-list">
+          @for (hookah of hookahs; track hookah.id; let i = $index) {
+            <button 
+              type="button" 
+              class="hookah-select-item" 
+              [class.active]="selectedIndex === i"
+              (click)="selectHookah(i)"
+              [style.--item-accent]="hookah.themeColor">
+              
+              <div class="item-visual" [style.background]="hookah.themeColor + '20'">
+                <svg viewBox="0 0 40 50" class="mini-hookah-svg">
+                  <!-- Mini Hookah Icon -->
+                  <path d="M20 4v6m-6 3h12l-2 5h-8l-2-5Z" [attr.stroke]="hookah.themeColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M20 18v14m-7 0h14l3 12H10l3-12Z" [attr.stroke]="hookah.themeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="20" cy="40" r="3" [attr.fill]="hookah.themeColor" opacity="0.6"/>
+                </svg>
+              </div>
+
+              <div class="item-details">
+                <div class="item-top">
+                  <strong class="item-name">{{ hookah.name }}</strong>
+                  <span class="status-indicator-tag" [ngClass]="hookah.status">
+                    {{ hookah.status === 'optimal' ? 'Al día' : 'Limpiar' }}
+                  </span>
+                </div>
+                <p class="item-material">{{ hookah.material }} · {{ hookah.height }}</p>
+                <div class="item-sub">
+                  <span>{{ hookah.totalSessions }} sesiones</span>
+                  <span class="dot-sep">·</span>
+                  <span>{{ hookah.lastCleaned }}</span>
+                </div>
+              </div>
+
+              <div class="select-indicator" aria-hidden="true">
+                <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </button>
+          }
+        </div>
+
+        <button class="btn-ghost-full" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Añadir nueva kachimba
+        </button>
+      </section>
+
+      <!-- Card 2: Telemetría & Rendimiento de la Kachimba Activa -->
+      <section class="cockpit-card">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">CALIBRACIÓN ACTIVA</span>
+            <h2 class="card-title">Especificaciones</h2>
+          </div>
+          <span class="quality-chip">{{ currentHookah.sealQuality }}% sellado</span>
+        </div>
+
+        <div class="specs-matrix">
+          <div class="spec-cell">
+            <span class="spec-icon">📐</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Altura & Peso</span>
+              <strong class="spec-val">{{ currentHookah.height }} · {{ currentHookah.weight }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell">
+            <span class="spec-icon">💨</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Sistema Purga</span>
+              <strong class="spec-val">{{ currentHookah.purgeType }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell">
+            <span class="spec-icon">💧</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Nivel de Agua</span>
+              <strong class="spec-val">{{ currentHookah.waterLevel }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell">
+            <span class="spec-icon">⚡</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Difusor</span>
+              <strong class="spec-val">{{ currentHookah.diffuser }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seal bar indicator -->
+        <div class="seal-bar-box">
+          <div class="seal-bar-info">
+            <span>Hermeticidad de juntas</span>
+            <strong>{{ currentHookah.sealQuality }}% Estanqueidad</strong>
+          </div>
+          <div class="seal-progress">
+            <div class="seal-progress-fill" [style.width.%]="currentHookah.sealQuality" [style.background]="currentHookah.themeColor"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 3: Control de Sesión Activa -->
+      <section class="cockpit-card session-control-card" [class.running]="isSessionActive">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">CONTROL DE FUMADA</span>
+            <h2 class="card-title">Sesión en Vivo</h2>
+          </div>
+          <span class="live-badge" *ngIf="isSessionActive">EN CURSO</span>
+        </div>
+
+        <div class="timer-display-box">
+          <div class="digital-timer">{{ formattedSessionTime }}</div>
+          <span class="timer-label">{{ isSessionActive ? 'Tiempo fumando' : 'Kachimba lista para sesión' }}</span>
+        </div>
+
+        <div class="session-meters">
+          <div class="session-meter-item">
+            <div class="meter-head">
+              <span>Rendimiento carbones (3x 26mm)</span>
+              <strong>{{ isSessionActive ? '78% activo' : 'Esperando encendido' }}</strong>
+            </div>
+            <div class="meter-bar">
+              <div class="meter-fill coals" [style.width.%]="isSessionActive ? 78 : 100"></div>
+            </div>
+          </div>
+          <div class="session-meter-item">
+            <div class="meter-head">
+              <span>Temperatura en cazoleta</span>
+              <strong>{{ isSessionActive ? '208°C (Óptima)' : 'Temperatura ambiente' }}</strong>
+            </div>
+            <div class="meter-bar">
+              <div class="meter-fill temp" [style.width.%]="isSessionActive ? 85 : 10"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="session-actions-row">
+          <button class="btn-session-main" type="button" (click)="toggleSession()">
+            <svg *ngIf="!isSessionActive" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="m8 5 11 7-11 7V5z"/></svg>
+            <svg *ngIf="isSessionActive" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            {{ isSessionActive ? 'Pausar Sesión' : 'Iniciar Sesión' }}
+          </button>
+          <button class="btn-session-secondary" type="button" (click)="resetSession()" [disabled]="sessionSeconds === 0" title="Reiniciar contador">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ==================== CENTER STAGE: LA GRAN KACHIMBA ==================== -->
+    <section class="stage-center" aria-label="Visualizador central de la kachimba">
+      
+      <!-- Stage Header & Model Carousel Switcher -->
+      <div class="stage-topbar">
+        <div class="stage-tag-group">
+          <span class="stage-eyebrow">CENTRO DE CONTROL</span>
+          <h1 class="stage-title">{{ currentHookah.name }}</h1>
+          <span class="stage-subtitle">{{ currentHookah.tagline }}</span>
+        </div>
+
+        <div class="stage-carousel-controls">
+          <button class="carousel-arrow" type="button" (click)="prevHookah()" title="Kachimba anterior" aria-label="Kachimba anterior">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="carousel-dots">
+            @for (hookah of hookahs; track hookah.id; let i = $index) {
+              <button 
+                type="button"
+                class="carousel-dot" 
+                [class.active]="selectedIndex === i"
+                [style.--dot-color]="hookah.themeColor"
+                (click)="selectHookah(i)"
+                [attr.aria-label]="hookah.name">
+              </button>
+            }
+          </div>
+          <button class="carousel-arrow" type="button" (click)="nextHookah()" title="Kachimba siguiente" aria-label="Kachimba siguiente">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Showcase Container with the Large Hookah -->
+      <div class="hookah-showcase-stage" [style.--active-color]="currentHookah.themeColor" [style.--active-glow]="currentHookah.glowColor">
+        
+        <!-- Ambient Stage Glow & Smoke Effect -->
+        <div class="stage-ambient-glow" aria-hidden="true"></div>
+
+        <!-- Realistic Animated Smoke Particles wafting upwards -->
+        <div class="smoke-canvas" aria-hidden="true">
+          <div class="smoke-puff smoke-1"></div>
+          <div class="smoke-puff smoke-2"></div>
+          <div class="smoke-puff smoke-3"></div>
+          <div class="smoke-puff smoke-4"></div>
+          <div class="smoke-puff smoke-5"></div>
+        </div>
+
+        <!-- THE BIG HOOKAH SVG (Grandiosa kachimba central detallada) -->
+        <div class="big-hookah-wrapper">
+          <svg 
+            class="big-hookah-svg" 
+            viewBox="0 0 460 760" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            [attr.aria-label]="'Ilustración central de ' + currentHookah.name">
+            
+            <defs>
+              <!-- Charcoal Ember Radial Glow -->
+              <radialGradient id="charcoalGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffedd5"/>
+                <stop offset="25%" stop-color="#ff7a00"/>
+                <stop offset="70%" stop-color="#c22700"/>
+                <stop offset="100%" stop-color="#360a00"/>
+              </radialGradient>
+
+              <!-- Metallic Stainless Stem Linear Gradient -->
+              <linearGradient id="metalStemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#555268"/>
+                <stop offset="25%" stop-color="#9e9bb0"/>
+                <stop offset="50%" stop-color="#ffffff"/>
+                <stop offset="75%" stop-color="#8c899e"/>
+                <stop offset="100%" stop-color="#3d3a4d"/>
+              </linearGradient>
+
+              <!-- Dynamic Accent Metal Gradient -->
+              <linearGradient id="accentMetalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" [attr.stop-color]="currentHookah.stemColor"/>
+                <stop offset="40%" [attr.stop-color]="currentHookah.themeColor"/>
+                <stop offset="70%" stop-color="#ffffff" stop-opacity="0.8"/>
+                <stop offset="100%" [attr.stop-color]="currentHookah.stemColor"/>
+              </linearGradient>
+
+              <!-- Bohemian Glass Body Gradient -->
+              <linearGradient id="glassBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.4)"/>
+                <stop offset="15%" stop-color="rgba(255,255,255,0.1)"/>
+                <stop offset="85%" stop-color="rgba(255,255,255,0.08)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0.45)"/>
+              </linearGradient>
+
+              <!-- Glass Water Gradient -->
+              <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" [attr.stop-color]="currentHookah.waterColor" stop-opacity="0.45"/>
+                <stop offset="40%" [attr.stop-color]="currentHookah.waterColor" stop-opacity="0.75"/>
+                <stop offset="100%" [attr.stop-color]="currentHookah.themeColor" stop-opacity="0.9"/>
+              </linearGradient>
+
+              <!-- Hose Gradient -->
+              <linearGradient id="hoseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2a2935"/>
+                <stop offset="40%" stop-color="#464455"/>
+                <stop offset="70%" [attr.stop-color]="currentHookah.themeColor" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#191822"/>
+              </linearGradient>
+
+              <!-- Glass reflection highlight -->
+              <linearGradient id="reflectionGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#fff" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- ================= HOSE BACKGROUND LOOP ================= -->
+            <!-- Hose coming from purge/hose port curving behind & to the front -->
+            <path 
+              d="M280 435 C350 440, 420 480, 410 560 C400 640, 310 680, 240 680 C170 680, 110 650, 110 580 C110 510, 150 470, 175 460" 
+              stroke="url(#hoseGrad)" 
+              stroke-width="17" 
+              stroke-linecap="round" 
+              fill="none" 
+              class="hose-shadow"
+            />
+            <path 
+              d="M280 435 C350 440, 420 480, 410 560 C400 640, 310 680, 240 680 C170 680, 110 650, 110 580 C110 510, 150 470, 175 460" 
+              stroke="rgba(255,255,255,0.2)" 
+              stroke-width="3" 
+              stroke-linecap="round" 
+              stroke-dasharray="1 6"
+              fill="none" 
+            />
+
+            <!-- ================= MOUTHPIECE (BOQUILLA DE ALUMINIO) ================= -->
+            <!-- Long ergonomic luxury wand/mouthpiece resting on the right side -->
+            <g class="mouthpiece-group">
+              <rect x="390" y="460" width="14" height="150" rx="6" fill="url(#metalStemGrad)" transform="rotate(-15 390 460)"/>
+              <rect x="393" y="450" width="8" height="20" rx="3" [attr.fill]="currentHookah.themeColor" transform="rotate(-15 390 460)"/>
+              <rect x="391" y="520" width="12" height="18" rx="2" fill="#1e1b29" transform="rotate(-15 390 460)"/>
+              <!-- Hose tip connector -->
+              <circle cx="375" cy="625" r="9" fill="url(#metalStemGrad)"/>
+            </g>
+
+            <!-- ================= WATER BASE (VASO DE CRISTAL) ================= -->
+            <!-- Glass Base Shadow -->
+            <ellipse cx="230" cy="710" rx="145" ry="24" fill="rgba(0,0,0,0.55)" filter="blur(10px)"/>
+            <ellipse cx="230" cy="708" rx="130" ry="16" [attr.fill]="currentHookah.glowColor" filter="blur(16px)"/>
+
+            <!-- Downstem Submerged in water (Tubo de Inmersión) -->
+            <rect x="223" y="430" width="14" height="235" fill="url(#metalStemGrad)"/>
+            <!-- Diffuser holes at downstem end -->
+            <g class="diffuser-group">
+              <rect x="220" y="650" width="20" height="18" rx="3" [attr.fill]="currentHookah.themeColor"/>
+              <circle cx="224" cy="656" r="1.5" fill="#fff"/>
+              <circle cx="230" cy="656" r="1.5" fill="#fff"/>
+              <circle cx="236" cy="656" r="1.5" fill="#fff"/>
+              <circle cx="224" cy="662" r="1.5" fill="#fff"/>
+              <circle cx="230" cy="662" r="1.5" fill="#fff"/>
+              <circle cx="236" cy="662" r="1.5" fill="#fff"/>
+            </g>
+
+            <!-- Liquid Water in Base -->
+            <path 
+              d="M142 660 C128 620, 140 550, 175 510 C210 510, 250 510, 285 510 C320 550, 332 620, 318 660 C305 700, 155 700, 142 660 Z" 
+              fill="url(#waterGrad)"
+              class="water-liquid"
+            />
+            
+            <!-- Animated Water Bubbles -->
+            <g class="water-bubbles">
+              <circle class="bubble b1" cx="218" cy="630" r="3.5" fill="#fff" opacity="0.65"/>
+              <circle class="bubble b2" cx="242" cy="615" r="2.8" fill="#fff" opacity="0.75"/>
+              <circle class="bubble b3" cx="226" cy="590" r="4.2" fill="#fff" opacity="0.6"/>
+              <circle class="bubble b4" cx="238" cy="565" r="3.0" fill="#fff" opacity="0.7"/>
+              <circle class="bubble b5" cx="212" cy="545" r="2.4" fill="#fff" opacity="0.55"/>
+              <circle class="bubble b6" cx="245" cy="530" r="3.8" fill="#fff" opacity="0.7"/>
+            </g>
+
+            <!-- Water Surface Wave -->
+            <ellipse cx="230" cy="510" rx="55" ry="8" fill="rgba(255,255,255,0.4)"/>
+            <ellipse cx="230" cy="510" rx="52" ry="5" [attr.fill]="currentHookah.waterColor" opacity="0.8"/>
+
+            <!-- Transparent Bohemian Glass Contour & Reflections -->
+            <path 
+              d="M195 435 L200 470 C165 500, 120 560, 122 650 C124 705, 170 718, 230 718 C290 718, 336 705, 338 650 C340 560, 295 500, 260 470 L265 435 Z" 
+              fill="url(#glassBodyGrad)" 
+              stroke="rgba(255,255,255,0.4)" 
+              stroke-width="2.5"
+            />
+
+            <!-- Glass Thick Base Bottom Ring -->
+            <path 
+              d="M130 660 C132 708, 172 724, 230 724 C288 724, 328 708, 330 660 C322 710, 138 710, 130 660 Z" 
+              fill="rgba(255,255,255,0.25)"
+            />
+
+            <!-- Left Glass Vertical Reflection Streak -->
+            <path 
+              d="M142 540 C135 600, 140 655, 150 680 C146 660, 142 610, 148 550 Z" 
+              fill="url(#reflectionGrad)"
+            />
+            <!-- Right Glass Reflection Streak -->
+            <path 
+              d="M318 540 C325 600, 320 655, 310 680 C314 660, 318 610, 312 550 Z" 
+              fill="url(#reflectionGrad)"
+            />
+
+            <!-- Glass Neck Collar Ring (Junta del cuello) -->
+            <rect x="194" y="426" width="72" height="12" rx="4" fill="url(#metalStemGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <rect x="202" y="433" width="56" height="5" rx="2" [attr.fill]="currentHookah.themeColor"/>
+
+            <!-- ================= HEART / CHAMBER (CÁMARA Y CONECTORES) ================= -->
+            <g class="hookah-chamber">
+              <!-- Base Heart Block -->
+              <path d="M190 395 L270 395 L266 428 L194 428 Z" fill="url(#accentMetalGrad)" stroke="#1a1824" stroke-width="1.5"/>
+              
+              <!-- Purge Valve (Izquierda) with release vents -->
+              <rect x="168" y="402" width="24" height="14" rx="4" fill="url(#metalStemGrad)"/>
+              <circle cx="173" cy="409" r="2" fill="#121118"/>
+              <circle cx="180" cy="409" r="2" fill="#121118"/>
+              <circle cx="187" cy="409" r="2" fill="#121118"/>
+
+              <!-- Hose Port (Derecha con conector magnético/rosca) -->
+              <path d="M268 400 L292 405 L290 422 L266 422 Z" fill="url(#metalStemGrad)"/>
+              <rect x="286" y="403" width="10" height="20" rx="3" [attr.fill]="currentHookah.themeColor"/>
+            </g>
+
+            <!-- ================= STEM (MÁSTIL DETALLADO) ================= -->
+            <g class="hookah-stem">
+              <!-- Center Core Stem -->
+              <rect x="221" y="165" width="18" height="230" fill="url(#metalStemGrad)"/>
+              
+              <!-- Decorative Machined Rings & Accents -->
+              <!-- Upper Collar -->
+              <rect x="210" y="170" width="40" height="10" rx="3" fill="url(#accentMetalGrad)"/>
+              <rect x="214" y="180" width="32" height="6" rx="2" fill="url(#metalStemGrad)"/>
+
+              <!-- Decorative Segment 1 -->
+              <rect x="212" y="210" width="36" height="42" rx="6" fill="url(#accentMetalGrad)"/>
+              <!-- Slits / Vertical Purge channels in stem -->
+              <line x1="220" y1="216" x2="220" y2="246" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+              <line x1="226" y1="214" x2="226" y2="248" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="234" y1="214" x2="234" y2="248" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="240" y1="216" x2="240" y2="246" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+              <!-- Middle Accent Ring -->
+              <ellipse cx="230" cy="275" rx="24" ry="7" fill="url(#metalStemGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+              <ellipse cx="230" cy="275" rx="16" ry="4" [attr.fill]="currentHookah.themeColor"/>
+
+              <!-- Decorative Segment 2 -->
+              <rect x="212" y="295" width="36" height="52" rx="6" fill="url(#accentMetalGrad)"/>
+              <line x1="220" y1="302" x2="220" y2="340" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+              <line x1="226" y1="300" x2="226" y2="342" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="234" y1="300" x2="234" y2="342" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="240" y1="302" x2="240" y2="340" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+              <!-- Lower Stem Base Ring -->
+              <rect x="208" y="365" width="44" height="14" rx="4" fill="url(#metalStemGrad)"/>
+              <rect x="214" y="379" width="32" height="16" fill="url(#accentMetalGrad)"/>
+            </g>
+
+            <!-- ================= ASH TRAY / PLATO DE CENIZAS ================= -->
+            <g class="hookah-tray">
+              <!-- Tray Shadow -->
+              <ellipse cx="230" cy="165" rx="88" ry="12" fill="rgba(0,0,0,0.4)"/>
+              <!-- Tray Outer Lip -->
+              <path 
+                d="M136 150 C140 168, 320 168, 324 150 L318 156 C314 172, 146 172, 142 156 Z" 
+                fill="url(#metalStemGrad)" 
+                stroke="rgba(255,255,255,0.3)" 
+                stroke-width="1"
+              />
+              <!-- Tray Surface -->
+              <ellipse cx="230" cy="154" rx="92" ry="14" fill="url(#metalStemGrad)"/>
+              <ellipse cx="230" cy="154" rx="84" ry="11" fill="#2d2b38" stroke="url(#accentMetalGrad)" stroke-width="1.5"/>
+              <!-- Tray Center Fitting -->
+              <ellipse cx="230" cy="154" rx="20" ry="4" [attr.fill]="currentHookah.themeColor"/>
+            </g>
+
+            <!-- ================= BOWL CONE & ADAPTER ================= -->
+            <path d="M222 135 L238 135 L235 152 L225 152 Z" fill="url(#metalStemGrad)"/>
+            <!-- Silicone Bowl Grommet -->
+            <rect x="224" y="130" width="12" height="6" rx="2" fill="#fff" opacity="0.7"/>
+
+            <!-- ================= BOWL (CAZOLETA PHUNNEL) ================= -->
+            <g class="hookah-bowl">
+              <!-- Clay Bowl Body -->
+              <path 
+                d="M210 130 C206 108, 192 98, 192 84 L268 84 C268 98, 254 108, 250 130 Z" 
+                [attr.fill]="currentHookah.bowlColor" 
+                stroke="#181523" 
+                stroke-width="1.5"
+              />
+              <!-- Bowl Glaze highlight -->
+              <path 
+                d="M196 90 C196 96, 206 112, 212 126" 
+                stroke="rgba(255,255,255,0.4)" 
+                stroke-width="3" 
+                stroke-linecap="round"
+              />
+              <!-- Phunnel Lip -->
+              <ellipse cx="230" cy="84" rx="38" ry="8" [attr.fill]="currentHookah.bowlColor"/>
+              <ellipse cx="230" cy="84" rx="35" ry="6" fill="#1b1728" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <!-- Central Phunnel Hole / Spire -->
+              <ellipse cx="230" cy="84" rx="11" ry="3" fill="url(#metalStemGrad)"/>
+            </g>
+
+            <!-- ================= HMD & GLOWING COALS (GESTOR & CARBONES) ================= -->
+            <g class="hookah-hmd">
+              <!-- HMD Base (Kaloud Lotus Style) -->
+              <ellipse cx="230" cy="82" rx="36" ry="7" fill="url(#metalStemGrad)"/>
+              <path d="M194 82 L198 62 L262 62 L266 82 Z" fill="url(#metalStemGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+              
+              <!-- Air vents in HMD -->
+              <line x1="210" y1="67" x2="210" y2="76" stroke="#1c1a24" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="220" y1="67" x2="220" y2="76" stroke="#1c1a24" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="230" y1="67" x2="230" y2="76" stroke="#1c1a24" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="240" y1="67" x2="240" y2="76" stroke="#1c1a24" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="250" y1="67" x2="250" y2="76" stroke="#1c1a24" stroke-width="2.5" stroke-linecap="round"/>
+
+              <!-- Burning Natural Coconut Coals (3 cubes) -->
+              <!-- Coal 1 (Left) -->
+              <g class="coal-cube coal-pulse-1">
+                <rect x="206" y="50" width="15" height="15" rx="3" fill="url(#charcoalGlow)"/>
+                <!-- Ember ash texture -->
+                <circle cx="210" cy="54" r="1.5" fill="#ffe4d6"/>
+                <circle cx="216" cy="58" r="1.2" fill="#ffe4d6"/>
+                <rect x="208" y="52" width="11" height="4" fill="#ff7a00" opacity="0.8"/>
+              </g>
+
+              <!-- Coal 2 (Center) -->
+              <g class="coal-cube coal-pulse-2">
+                <rect x="222" y="47" width="16" height="16" rx="3" fill="url(#charcoalGlow)"/>
+                <circle cx="227" cy="51" r="1.8" fill="#ffffff"/>
+                <circle cx="234" cy="57" r="1.4" fill="#ffedd5"/>
+                <rect x="224" y="49" width="12" height="4" fill="#ffa726" opacity="0.9"/>
+              </g>
+
+              <!-- Coal 3 (Right) -->
+              <g class="coal-cube coal-pulse-3">
+                <rect x="239" y="51" width="15" height="15" rx="3" fill="url(#charcoalGlow)"/>
+                <circle cx="244" cy="55" r="1.4" fill="#ffe4d6"/>
+                <circle cx="249" cy="60" r="1.2" fill="#ffe4d6"/>
+                <rect x="241" y="53" width="11" height="4" fill="#ff7a00" opacity="0.8"/>
+              </g>
+
+              <!-- HMD Handle (Silicona aislante) -->
+              <path d="M260 70 L282 66" stroke="#222" stroke-width="4.5" stroke-linecap="round"/>
+              <circle cx="282" cy="66" r="3.5" [attr.fill]="currentHookah.themeColor"/>
+            </g>
+
+          </svg>
+
+          <!-- ================= INTERACTIVE HOTSPOT PINS ================= -->
+          <!-- Pin 1: Bowl (Top) -->
+          <button 
+            type="button"
+            class="hotspot-pin pin-bowl" 
+            [class.active]="activeHotspot.id === 'bowl'"
+            (click)="selectHotspot(hotspots[0])"
+            aria-label="Inspeccionar Cazoleta y Gestor de Calor">
+            <span class="pin-radar"></span>
+            <span class="pin-core">1</span>
+            <span class="pin-tooltip">Cazoleta & Calor</span>
+          </button>
+
+          <!-- Pin 2: Stem & Purge (Center) -->
+          <button 
+            type="button"
+            class="hotspot-pin pin-stem" 
+            [class.active]="activeHotspot.id === 'stem'"
+            (click)="selectHotspot(hotspots[1])"
+            aria-label="Inspeccionar Mástil y Purga">
+            <span class="pin-radar"></span>
+            <span class="pin-core">2</span>
+            <span class="pin-tooltip">Mástil & Purga 360°</span>
+          </button>
+
+          <!-- Pin 3: Base & Water (Bottom) -->
+          <button 
+            type="button"
+            class="hotspot-pin pin-base" 
+            [class.active]="activeHotspot.id === 'base'"
+            (click)="selectHotspot(hotspots[2])"
+            aria-label="Inspeccionar Base de Cristal y Agua">
+            <span class="pin-radar"></span>
+            <span class="pin-core">3</span>
+            <span class="pin-tooltip">Base & Nivel de Agua</span>
+          </button>
+
+          <!-- Pin 4: Hose & Seal (Side) -->
+          <button 
+            type="button"
+            class="hotspot-pin pin-hose" 
+            [class.active]="activeHotspot.id === 'hose'"
+            (click)="selectHotspot(hotspots[3])"
+            aria-label="Inspeccionar Manguera y Hermeticidad">
+            <span class="pin-radar"></span>
+            <span class="pin-core">4</span>
+            <span class="pin-tooltip">Manguera Soft-Touch</span>
+          </button>
+
+        </div>
+
+        <!-- Popover Card for Active Hotspot Inspection -->
+        @if (isInspecting) {
+          <div class="hotspot-inspector-card" [style.--glow]="currentHookah.themeColor">
+            <div class="inspector-header">
+              <div class="inspector-badge">
+                <span class="tag-accent">{{ activeHotspot.tag }}</span>
+                <strong>{{ activeHotspot.title }}</strong>
+              </div>
+              <button class="close-inspector-btn" type="button" (click)="toggleInspect()" aria-label="Cerrar panel de inspección">✕</button>
+            </div>
+            <p class="inspector-desc">{{ activeHotspot.description }}</p>
+            <div class="inspector-footer">
+              <div class="inspector-metric">
+                <span class="m-label">{{ activeHotspot.metricLabel }}</span>
+                <strong class="m-val">{{ activeHotspot.metricValue }}</strong>
+              </div>
+              <div class="inspector-nav">
+                @for (hs of hotspots; track hs.id) {
+                  <button 
+                    type="button"
+                    class="hs-nav-btn" 
+                    [class.current]="activeHotspot.id === hs.id"
+                    (click)="selectHotspot(hs)"
+                    [title]="hs.title">
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Quick Action Floating Bar directly below the Central Hookah -->
+      <div class="stage-actions-bar">
+        <button 
+          class="stage-btn primary-stage-btn" 
+          type="button" 
+          (click)="toggleSession()"
+          [style.--btn-color]="currentHookah.themeColor">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span>{{ isSessionActive ? 'Pausar Sesión Activa' : 'Iniciar Sesión con ' + currentHookah.name }}</span>
+        </button>
+
+        <button 
+          class="stage-btn secondary-stage-btn" 
+          type="button" 
+          (click)="markCurrentAsCleaned()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+          </svg>
+          <span>Registrar Limpieza</span>
+        </button>
+
+        <button 
+          class="stage-btn secondary-stage-btn" 
+          type="button" 
+          (click)="toggleInspect()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>{{ isInspecting ? 'Ocultar Puntos' : 'Inspeccionar Partes' }}</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==================== RIGHT COLUMN: CUIDADOS, INVENTARIO & AGENDA ==================== -->
+    <aside class="flank-column flank-right" aria-label="Cuidados, accesorios y agenda">
+      
+      <!-- Card 1: Rutina de Cuidado Interactiva -->
+      <section class="cockpit-card">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">MANTENIMIENTO</span>
+            <h2 class="card-title">Rutina de Cuidados</h2>
+          </div>
+          <span class="status-indicator-tag clean">{{ completedTasksCount }}/{{ tasks.length }} listos</span>
+        </div>
+
+        <!-- Weekly Progress Ring & Banner -->
+        <div class="care-progress-box">
+          <div class="progress-radial-circle" [style.--percent]="careProgressPercentage">
+            <span class="circle-val">{{ careProgressPercentage }}%</span>
+          </div>
+          <div class="progress-details">
+            <strong>Semana al {{ careProgressPercentage }}%</strong>
+            <p>Mantienes tus kachimbas en un estado de sabor y tiro impecables.</p>
+          </div>
+        </div>
+
+        <!-- Interactive Task Checklist -->
+        <div class="care-tasks-checklist">
+          @for (task of tasks; track task.id) {
+            <div 
+              class="task-row" 
+              [class.completed]="task.completed"
+              (click)="toggleTask(task)"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="task.title">
+              
+              <div class="checkbox-circle" [class.checked]="task.completed">
+                <svg *ngIf="task.completed" viewBox="0 0 20 20" width="12" height="12" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+
+              <div class="task-info">
+                <span class="task-name">{{ task.title }}</span>
+                <span class="task-subtext">{{ task.detail }}</span>
+              </div>
+
+              <span class="task-badge" [class.highlight]="task.period === 'HOY'">
+                {{ task.period }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <button class="btn-ghost-full" type="button" (click)="markCurrentAsCleaned()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Marcar {{ currentHookah.name }} como Limpia
+        </button>
+      </section>
+
+      <!-- Card 2: Inventario de Accesorios & Consumibles -->
+      <section class="cockpit-card">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">CONSUMIBLES</span>
+            <h2 class="card-title">Accesorios & Stock</h2>
+          </div>
+          <span class="count-badge">Al día</span>
+        </div>
+
+        <div class="inventory-grid">
+          <!-- Item 1: Carbón Natural -->
+          <div class="inventory-slot">
+            <div class="slot-head">
+              <span class="slot-icon">🪵</span>
+              <div class="slot-text">
+                <strong>King Coco 26mm</strong>
+                <small>Carbón de coco natural 1kg</small>
+              </div>
+            </div>
+            <div class="slot-meter">
+              <div class="meter-bar">
+                <div class="meter-fill fill-good" style="width: 82%;"></div>
+              </div>
+              <span class="meter-number">82% restante</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Cazoletas Favoritas -->
+          <div class="inventory-slot">
+            <div class="slot-head">
+              <span class="slot-icon">🏺</span>
+              <div class="slot-text">
+                <strong>Cazoleta Oblako M</strong>
+                <small>Barro blanco esmaltado</small>
+              </div>
+            </div>
+            <div class="slot-meter">
+              <div class="meter-bar">
+                <div class="meter-fill fill-good" style="width: 100%;"></div>
+              </div>
+              <span class="meter-number">Limpia y lista</span>
+            </div>
+          </div>
+
+          <!-- Item 3: Kit de Limpieza -->
+          <div class="inventory-slot">
+            <div class="slot-head">
+              <span class="slot-icon">✨</span>
+              <div class="slot-text">
+                <strong>Kit Cepillos + Limpiador</strong>
+                <small>Cepillo mástil 45cm + líquido bio</small>
+              </div>
+            </div>
+            <div class="slot-meter">
+              <div class="meter-bar">
+                <div class="meter-fill fill-warning" style="width: 40%;"></div>
+              </div>
+              <span class="meter-number">Reponer limpiador pronto</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 3: Agenda & Próximos Mantenimientos -->
+      <section class="cockpit-card">
+        <div class="card-header">
+          <div>
+            <span class="section-tag">CALENDARIO</span>
+            <h2 class="card-title">Próximos Cuidados</h2>
+          </div>
+          <span class="action-link">Ver todo</span>
+        </div>
+
+        <div class="agenda-items">
+          <div class="agenda-row today-agenda">
+            <div class="date-tile today">
+              <strong>26</strong>
+              <span>OCT</span>
+            </div>
+            <div class="agenda-text">
+              <strong>Limpieza de base y mástil</strong>
+              <small>Alma Mini · 10 min de mantenimiento</small>
+            </div>
+            <span class="agenda-tag urgent">HOY</span>
+          </div>
+
+          <div class="agenda-row">
+            <div class="date-tile">
+              <strong>29</strong>
+              <span>OCT</span>
+            </div>
+            <div class="agenda-text">
+              <strong>Revisión de juntas y purga</strong>
+              <small>Nébula One · Chequeo de estanqueidad</small>
+            </div>
+            <span class="agenda-tag">JUE</span>
+          </div>
+
+          <div class="agenda-row">
+            <div class="date-tile">
+              <strong>02</strong>
+              <span>NOV</span>
+            </div>
+            <div class="agenda-text">
+              <strong>Descalcificación con vinagre blanco</strong>
+              <small>Oasis Glass · Brillo de cristal bohemio</small>
+            </div>
+            <span class="agenda-tag">LUN</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+  </main>
+</div>
