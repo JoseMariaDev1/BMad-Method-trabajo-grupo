@@ -110,9 +110,12 @@
           }
         </div>
 
-        <button class="btn-ghost-full" type="button">
+        <button class="btn-ghost-full" type="button" (click)="openAddModal()">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Añadir nueva kachimba
+        </button>
+        <button *ngIf="hookahs.length > 1" class="btn-delete-hookah" type="button" (click)="deleteCurrentHookah()" title="Retirar kachimba actual">
+          ✕ Retirar {{ currentHookah.name }}
         </button>
       </section>
 
@@ -127,6 +130,36 @@
         </div>
 
         <div class="specs-matrix">
+          <div class="spec-cell">
+            <span class="spec-icon">📐</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Altura & Peso</span>
+              <strong class="spec-val">{{ currentHookah.height }} · {{ currentHookah.weight }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell">
+            <span class="spec-icon">💧</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Nivel de Agua</span>
+              <strong class="spec-val">{{ currentHookah.waterLevel }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell full-width">
+            <span class="spec-icon">💨</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Sistema Purga</span>
+              <strong class="spec-val">{{ currentHookah.purgeType }}</strong>
+            </div>
+          </div>
+          <div class="spec-cell full-width">
+            <span class="spec-icon">⚡</span>
+            <div class="spec-meta">
+              <span class="spec-lbl">Difusor</span>
+              <strong class="spec-val">{{ currentHookah.diffuser }}</strong>
+            </div>
+          </div>
+        </div>
+        <div style="display:none">
           <div class="spec-cell">
             <span class="spec-icon">📐</span>
             <div class="spec-meta">
@@ -180,7 +213,7 @@
         </div>
 
         <div class="timer-display-box">
-          <div class="digital-timer">{{ formattedSessionTime }}</div>
+          <div class="digital-timer"><span>{{ formattedSessionTime }}</span><span class="timer-tenths" *ngIf="isSessionActive">.{{ sessionTenths }}</span></div>
           <span class="timer-label">{{ isSessionActive ? 'Tiempo fumando' : 'Kachimba lista para sesión' }}</span>
         </div>
 
@@ -188,19 +221,19 @@
           <div class="session-meter-item">
             <div class="meter-head">
               <span>Rendimiento carbones (3x 26mm)</span>
-              <strong>{{ isSessionActive ? '78% activo' : 'Esperando encendido' }}</strong>
+              <strong>{{ isSessionActive ? coalsHealth + '% activo' : 'Esperando encendido' }}</strong>
             </div>
             <div class="meter-bar">
-              <div class="meter-fill coals" [style.width.%]="isSessionActive ? 78 : 100"></div>
+              <div class="meter-fill coals" [style.width.%]="coalsHealth"></div>
             </div>
           </div>
           <div class="session-meter-item">
             <div class="meter-head">
               <span>Temperatura en cazoleta</span>
-              <strong>{{ isSessionActive ? '208°C (Óptima)' : 'Temperatura ambiente' }}</strong>
+              <strong>{{ isSessionActive ? bowlTemperature + '°C (Óptima)' : 'Temperatura ambiente (24°C)' }}</strong>
             </div>
             <div class="meter-bar">
-              <div class="meter-fill temp" [style.width.%]="isSessionActive ? 85 : 10"></div>
+              <div class="meter-fill temp" [style.width.%]="(bowlTemperature / 250) * 100"></div>
             </div>
           </div>
         </div>
@@ -211,7 +244,11 @@
             <svg *ngIf="isSessionActive" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             {{ isSessionActive ? 'Pausar Sesión' : 'Iniciar Sesión' }}
           </button>
-          <button class="btn-session-secondary" type="button" (click)="resetSession()" [disabled]="sessionSeconds === 0" title="Reiniciar contador">
+          <button class="btn-session-finish" type="button" (click)="finishSession()" *ngIf="isSessionActive || sessionSeconds > 0" title="Finalizar sesión y registrar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+            <span>Terminar</span>
+          </button>
+          <button class="btn-session-secondary" type="button" (click)="resetSession()" [disabled]="sessionSeconds === 0 && !isSessionActive" title="Reiniciar contador">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
         </div>
@@ -637,7 +674,7 @@
             <div class="inspector-footer">
               <div class="inspector-metric">
                 <span class="m-label">{{ activeHotspot.metricLabel }}</span>
-                <strong class="m-val">{{ activeHotspot.metricValue }}</strong>
+                <strong class="m-val">{{ getDynamicHotspotMetric(activeHotspot) }}</strong>
               </div>
               <div class="inspector-nav">
                 @for (hs of hotspots; track hs.id) {
@@ -699,7 +736,7 @@
       <section class="cockpit-card">
         <div class="card-header">
           <div>
-            <span class="section-tag">MANTENIMIENTO</span>
+            <span class="section-tag">MANTENIMIENTO · {{ currentHookah.name }}</span>
             <h2 class="card-title">Rutina de Cuidados</h2>
           </div>
           <span class="status-indicator-tag clean">{{ completedTasksCount }}/{{ tasks.length }} listos</span>
@@ -712,8 +749,20 @@
           </div>
           <div class="progress-details">
             <strong>Semana al {{ careProgressPercentage }}%</strong>
-            <p>Mantienes tus kachimbas en un estado de sabor y tiro impecables.</p>
+            <p>Cuidados específicos para mantener {{ currentHookah.name }} impecable.</p>
           </div>
+        </div>
+
+        <!-- New Task Form -->
+        <div class="new-task-bar">
+          <input
+            type="text"
+            class="input-new-task"
+            placeholder="Añadir cuidado (+ Enter)..."
+            [value]="newTaskTitle"
+            (input)="newTaskTitle = $any($event.target).value"
+            (keydown.enter)="addNewTask()">
+          <button class="btn-add-task-mini" type="button" (click)="addNewTask()" [disabled]="!newTaskTitle.trim()">+</button>
         </div>
 
         <!-- Interactive Task Checklist -->
@@ -739,7 +788,7 @@
               </div>
 
               <span class="task-badge" [class.highlight]="task.period === 'HOY'">
-                {{ task.period }}
+                {{ task.period }}</span><button class="btn-delete-task" type="button" (click)="deleteTask(task, $event)" title="Eliminar tarea">✕</button><span style="display:none">
               </span>
             </div>
           }
@@ -762,6 +811,37 @@
         </div>
 
         <div class="inventory-grid">
+          @for (item of inventory; track item.id) {
+            <div class="inventory-slot">
+              <div class="slot-head">
+                <span class="slot-icon">{{ item.icon }}</span>
+                <div class="slot-text">
+                  <strong>{{ item.name }}</strong>
+                  <small>{{ item.detail }}</small>
+                </div>
+              </div>
+              <div class="slot-meter">
+                <div class="meter-bar">
+                  <div
+                    class="meter-fill"
+                    [class.fill-good]="item.amount > item.warningThreshold"
+                    [class.fill-warning]="item.amount <= item.warningThreshold"
+                    [style.width.%]="item.isPercentage ? item.amount : (item.amount > 10 ? 100 : item.amount * 10)">
+                  </div>
+                </div>
+                <span class="meter-number">
+                  {{ item.amount }}{{ item.isPercentage ? '%' : ' ' + item.unit }}
+                  <span *ngIf="item.amount <= item.warningThreshold" class="low-stock-alert">⚠️ Bajo</span>
+                </span>
+              </div>
+              <div class="slot-quick-actions">
+                <button type="button" class="btn-inventory-action" (click)="useItem(item)" title="Consumir / Usar unidad">- Usar</button>
+                <button type="button" class="btn-inventory-action restock" (click)="restockItem(item)" title="Reponer stock">+ Reponer</button>
+              </div>
+            </div>
+          }
+        </div>
+        <div style="display:none">
           <!-- Item 1: Carbón Natural -->
           <div class="inventory-slot">
             <div class="slot-head">
@@ -867,4 +947,92 @@
     </aside>
 
   </main>
+
+  <!-- ==================== MODAL: AÑADIR NUEVA KACHIMBA ==================== -->
+  @if (isAddModalOpen) {
+    <div class="modal-backdrop" (click)="closeAddModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-badge">
+            <span class="tag-accent">COLECCIÓN</span>
+            <h3>Nueva Kachimba</h3>
+          </div>
+          <button type="button" class="close-inspector-btn" (click)="closeAddModal()" aria-label="Cerrar modal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre del modelo</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Ej. Alpha Hookah Model X"
+              [value]="newHookahName"
+              (input)="newHookahName = $any($event.target).value" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Edición / Subtítulo</label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Ej. Edición Carbono & Oro"
+              [value]="newHookahTagline"
+              (input)="newHookahTagline = $any($event.target).value" />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Material</label>
+              <select class="form-input" [value]="newHookahMaterial" (change)="newHookahMaterial = $any($event.target).value">
+                <option value="Acero Inoxidable V2A">Acero Inoxidable V2A</option>
+                <option value="Aluminio Aeroespacial">Aluminio Aeroespacial</option>
+                <option value="Fibra de Carbono">Fibra de Carbono</option>
+                <option value="Latón y Resina">Latón y Resina</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Altura</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Ej. 52 cm"
+                [value]="newHookahHeight"
+                (input)="newHookahHeight = $any($event.target).value" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Sistema de Purga</label>
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Ej. Cascada vertical 360°"
+                [value]="newHookahPurge"
+                (input)="newHookahPurge = $any($event.target).value" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color Temático</label>
+              <div class="color-picker-row">
+                <input
+                  type="color"
+                  class="color-picker-input"
+                  [value]="newHookahColor"
+                  (input)="newHookahColor = $any($event.target).value" />
+                <span class="color-preview-label">{{ newHookahColor }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()">Cancelar</button>
+          <button type="button" class="btn-save" (click)="saveNewHookah()" [disabled]="!newHookahName.trim()">
+            Guardar en Colección
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
