@@ -112,3 +112,15 @@ La aplicación se estructura en torno a **5 funcionalidades principales** comple
 ├── package.json                # Dependencias y scripts de ejecución
 └── README.md                   # Documentación técnica del proyecto
 ```
+
+## Bibliografía
+
+BMad Method:
+https://docs.bmad-method.org/
+
+BMAD v6 Is Here: 10-Minute Install and Agent Tour (GitHub Copilot + VS Code):
+https://www.youtube.com/watch?v=tM5dGuXyb4g&t=11s
+
+Google Antigravity:
+https://antigravity.google/
+```
