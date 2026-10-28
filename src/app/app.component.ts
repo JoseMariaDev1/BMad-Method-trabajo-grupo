@@ -350,9 +350,11 @@ export class AppComponent implements OnDestroy {
   // FUNCIONALIDAD 3: MONITOR DE SESIÓN DE FUMADA EN VIVO Y TELEMETRÍA TÉRMICA
   // =========================================================================
   isSessionActive: boolean = false;
+  isSmokeCurtainVisible: boolean = false;
   sessionSeconds: number = 0;
   sessionTenths: number = 0;
   private sessionTimerInterval: any = null;
+  private smokeCurtainTimeout: ReturnType<typeof setTimeout> | null = null;
 
   get formattedSessionTime(): string {
     const mins = Math.floor(this.sessionSeconds / 60);
@@ -376,6 +378,7 @@ export class AppComponent implements OnDestroy {
   toggleSession(): void {
     this.isSessionActive = !this.isSessionActive;
     if (this.isSessionActive) {
+      this.showSmokeCurtain();
       if (this.sessionSeconds === 0) {
         this.sessionSeconds = 1;
       }
@@ -396,6 +399,19 @@ export class AppComponent implements OnDestroy {
       }
       this.cdr.detectChanges();
     }
+  }
+
+  private showSmokeCurtain(): void {
+    if (this.smokeCurtainTimeout) {
+      clearTimeout(this.smokeCurtainTimeout);
+    }
+
+    this.isSmokeCurtainVisible = true;
+    this.smokeCurtainTimeout = setTimeout(() => {
+      this.isSmokeCurtainVisible = false;
+      this.smokeCurtainTimeout = null;
+      this.cdr.detectChanges();
+    }, 2400);
   }
 
   finishSession(): void {
@@ -585,6 +601,9 @@ export class AppComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this.sessionTimerInterval) {
       clearInterval(this.sessionTimerInterval);
+    }
+    if (this.smokeCurtainTimeout) {
+      clearTimeout(this.smokeCurtainTimeout);
     }
   }
 }

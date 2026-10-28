@@ -67,7 +67,60 @@ body::before {
   min-height: 100vh;
 }
 
-/* ==========================================================================
+.smoke-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.smoke-curtain::before,
+.smoke-curtain::after {
+  content: "";
+  position: absolute;
+  bottom: -70vh;
+  left: -30vw;
+  width: 160vw;
+  height: 140vh;
+  border-radius: 50%;
+  filter: blur(34px);
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 20% 75%, rgba(213, 218, 233, 0.48), transparent 35%),
+    radial-gradient(ellipse at 48% 68%, rgba(185, 192, 211, 0.56), transparent 38%),
+    radial-gradient(ellipse at 76% 78%, rgba(224, 226, 236, 0.46), transparent 34%);
+  animation: smokeRiseAcrossScreen 2.4s ease-out forwards;
+}
+
+.smoke-curtain::after {
+  bottom: -85vh;
+  left: -18vw;
+  width: 140vw;
+  opacity: 0;
+  filter: blur(44px);
+  background:
+    radial-gradient(ellipse at 28% 78%, rgba(196, 202, 220, 0.44), transparent 36%),
+    radial-gradient(ellipse at 63% 70%, rgba(226, 228, 237, 0.5), transparent 40%);
+  animation-delay: 120ms;
+}
+
+@keyframes smokeRiseAcrossScreen {
+  0% { opacity: 0; transform: translate3d(-3vw, 0, 0) rotate(-3deg) scale(0.82); }
+  18% { opacity: 0.45; }
+  42% { transform: translate3d(4vw, -30vh, 0) rotate(4deg) scale(1.02); }
+  68% { opacity: 0.2; transform: translate3d(-4vw, -68vh, 0) rotate(-3deg) scale(1.12); }
+  100% { opacity: 0; transform: translate3d(3vw, -112vh, 0) rotate(3deg) scale(1.22); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smoke-curtain::before,
+  .smoke-curtain::after {
+    animation-duration: 1ms;
+  }
+}
+
+/* ========================================================================== 
    TOP GLOBAL COCKPIT HEADER
    ========================================================================== */
 .cockpit-header {
